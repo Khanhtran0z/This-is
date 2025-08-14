@@ -1,2 +1,1 @@
-# This-is
-My dungeon
+Single-folder build. Open index.html. Start -> Boss scene (you control the Boss).

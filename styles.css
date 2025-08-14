@@ -1,0 +1,564 @@
+/* Import pixel font for retro look */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* Root theme variables */
+:root {
+  --bg: #0d0d0f;
+  --surface: #1b1c22;
+  --card: #262833;
+  --text: #e4e4ea;
+  --muted: #8a8da3;
+  --accent: #4f46e5;
+  --border: #34364a;
+  --radius: 0.5rem;
+  --transition: 0.2s ease;
+  /* Use pixel-like font throughout the UI */
+  font-family: 'Press Start 2P', monospace;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Panels used for character creation, boss fight, shop, and settings */
+.panel {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Form fields */
+.field {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+.field input,
+.field select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+/* Phase info */
+.phase-info {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Dungeon grid */
+.grid {
+  display: grid;
+  /* Define a CSS variable for cell size to use in animations */
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 64px;
+  gap: 0; /* remove gap for contiguous grid */
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Use inset box-shadow instead of border so adjacent cells share borders */
+  box-shadow: inset 0 0 0 1px var(--border);
+  border-radius: 0;
+  font-size: 0.8rem;
+  background-color: var(--surface);
+  user-select: none;
+  position: relative;
+}
+
+/* Overlay item and hero in cell */
+.cell .item,
+.cell .hero {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+.cell .item {
+  z-index: 1;
+  color: #fff;
+  font-weight: bold;
+}
+.cell .hero {
+  z-index: 2;
+  font-weight: bold;
+  color: #ffd700;
+  /* Transition for movement animations */
+  transition: transform 0.25s ease-out;
+}
+
+/* Monsters also animate when moving */
+.cell .monster {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: transform 0.25s ease-out;
+  z-index: 2;
+  color: #9ba3af;
+}
+
+/* Damage text overlay shown during attacks */
+.damage-text {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  color: #ff5555;
+  animation: damage-pop 0.6s forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes damage-pop {
+  from {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Attack bump animation for actors (heroes/monsters) */
+@keyframes attack-bump {
+  0% { transform: translate(0, 0); }
+  50% { transform: translate(-4px, 0); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Apply attack-bump animation when actors attack */
+.hero.attack,
+.monster.attack {
+  animation: attack-bump 0.25s ease;
+}
+
+/* Inventory bar */
+.inventory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.inventory-item {
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface);
+  font-size: 0.7rem;
+  user-select: none;
+  cursor: pointer;
+  transition: box-shadow var(--transition);
+}
+.inventory-item:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Highlight selected inventory item */
+.inventory-item.selected {
+  outline: 2px solid var(--accent);
+}
+
+/* Level up stat allocation panel styles */
+.stat-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.stat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.btn.small {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+}
+
+/* Shop items */
+.shop-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.shop-item button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  background-color: var(--accent);
+  color: #fff;
+  transition: background var(--transition), transform var(--transition);
+}
+.shop-item button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.fight-info {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Adjust log for new layout */
+.log {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  padding: 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Style panel headings and paragraphs */
+.panel h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.panel p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Disable the continue button if no save exists */
+#btn-continue-game[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* Parallax background uses two radial gradients that move subtly */
+.parallax-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(80rem 40rem at 20% 10%, rgba(255, 255, 255, 0.05), transparent 70%),
+    radial-gradient(50rem 25rem at 80% 20%, rgba(255, 255, 255, 0.04), transparent 65%);
+  z-index: -1;
+  animation: float 30s ease-in-out infinite alternate;
+
+  pointer-events: none;
+}
+
+@keyframes float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+/* Hero / Landing styles */
+.landing {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.hero-icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.tagline {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: none;
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.btn.primary {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.btn.ghost {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.config-info {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Game view */
+.game {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  flex-grow: 1;
+}
+
+.game-view h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+}
+
+.rooms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.room-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  min-width: 150px;
+  flex-grow: 1;
+}
+
+.room-card h3 {
+  margin: 0 0 0.4rem 0;
+  font-size: 1.1rem;
+}
+
+.room-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.log {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.log p {
+  margin: 0.3rem 0;
+  line-height: 1.4;
+}
+
+.command-bar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#command-input {
+  flex-grow: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* Settings panel overlay */
+.settings-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  z-index: 10;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+}
+
+.settings-panel h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.settings-panel label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.settings-panel input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+  margin-top: 0.25rem;
+}
+
+/* Hide the settings panel by default; the [hidden] attribute on element is used in HTML */
+
+/* Responsive design for small screens */
+@media (max-width: 600px) {
+  .btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.8rem;
+  }
+  .landing {
+    padding-top: 3rem;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Boss integrated */
+.boss-wrapper { display: grid; grid-template-columns: 1fr 320px; gap: 16px; }
+.boss-left { background: var(--panel-bg, #0e1530); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.06); }
+.boss-right { background: var(--panel-bg, #0e1530); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.06); display: grid; gap: 12px; align-content: start; }
+.boss-grid { position: relative; display: grid; grid-template-columns: repeat(6, 48px); grid-template-rows: repeat(6, 48px); gap: 6px; }
+.boss-grid .cell { width: 48px; height: 48px; border-radius: 10px; display: grid; place-items: center; user-select: none; cursor: pointer; background: #162040; border: 1px solid #24335e; transition: transform 0.05s ease; position: relative; }
+.boss-grid .cell:hover { transform: translateY(-2px); }
+.boss-grid .cell.player { background: #1e3a8a; border-color: #3b82f6; color: #cfe0ff; font-weight: 700; }
+.boss-grid .cell.enemy { background: #7f1d1d; border-color: #ef4444; color: #ffe0e0; font-weight: 700; }
+.boss-hud { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.boss-hud .hud-item { background: #0b1130; border: 1px solid #223153; border-radius: 10px; padding: 8px; text-align: center; }
+.boss-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.boss-controls button { border: 0; padding: 10px 12px; border-radius: 10px; cursor: pointer; background: #223153; color: #e8ecf1; font-weight: 600; }
+.boss-controls .wide { grid-column: 1 / -1; }
+.boss-hint { opacity: 0.75; font-size: 12px; margin-top: 8px; }
+.log.small { height: 180px; overflow-y: auto; }
+.panel[hidden]{ display:none !important; }
+#boss-panel[hidden]{ display:none !important; }
+/* Hitstop & shake */
+.boss-grid.hitstop .cell { transition: none !important; filter: contrast(1.2) brightness(1.1); }
+@keyframes screenShake { 0%,100%{transform:translate(0,0);} 20%{transform:translate(2px,-2px);} 40%{transform:translate(-2px,2px);} 60%{transform:translate(2px,1px);} 80%{transform:translate(-1px,-2px);} }
+.shake { animation: screenShake var(--shake-duration,120ms) ease-in-out; }
+/* Damage popup */
+.attack-effect { position: absolute; pointer-events: none; display: flex; flex-direction: column; align-items: center; animation: attackPop 0.8s ease-out forwards; z-index: 999; }
+.attack-effect img { width: 20px; height: 20px; }
+.attack-effect .damage-text { font-family: 'Press Start 2P', monospace, sans-serif; font-size: 12px; color: #ff4444; text-shadow: 1px 1px 0 #000; margin-top: 2px; }
+@keyframes attackPop { 0%{opacity:1;transform:translateY(0);} 80%{opacity:1;transform:translateY(-12px);} 100%{opacity:0;transform:translateY(-16px);} }
+
+#grid { position: relative; }
+
+
+/* Variant picker and wall visuals */
+.inventory.variants { margin-top: 8px; display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 8px; }
+.inventory.variants .inventory-item { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); padding: 8px; border-radius: 10px; cursor: pointer; position: relative; }
+.inventory.variants .inventory-item .sub { font-size: 12px; opacity: 0.8; display: block; }
+.inventory.variants .inventory-item.locked { opacity: 0.5; cursor: not-allowed; }
+.inventory.variants .inventory-item.locked::after { content: '🔒'; position: absolute; right: 8px; top: 6px; opacity: 0.9; }
+
+.grid .cell.has-wall { background: #b5651d; border-color: #8d4a12; }
+.grid .cell.has-wall.wood { background: #b5651d; border-color: #8d4a12; }
+.grid .cell.has-wall.stone { background: #888888; border-color: #555555; }
+.grid .cell.has-wall.iron { background: #aaaaaa; border-color: #666666; }
+.grid .cell .hp-badge { position: absolute; right: 2px; bottom: 2px; background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; padding: 2px 4px; border-radius: 6px; }
+.grid .cell.cracked::after {
+  content: ''; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0px, rgba(255,255,255,0.18) 2px, transparent 2px, transparent 4px);
+  pointer-events: none;
+}
+.panel[hidden]{ display:none !important; }
+#boss-panel[hidden]{ display:none !important; }
+.parallax-bg{ pointer-events: none; }
+
+#landing[hidden]{ display:none !important; }
+
+/* Ensure visible panels render */
+.panel:not([hidden]){ display:block; }

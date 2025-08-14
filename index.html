@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="This Is My Dungeon — be the Dungeon Lord. Create your character and defend your dungeon.">
+  <title>This Is My Dungeon</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Parallax background for subtle motion -->
+  <div class="parallax-bg"></div>
+
+  <!-- Landing page with main actions -->
+  <section id="landing" class="landing">
+    <header class="hero">
+      <div class="hero-icon">🏰</div>
+      <h1>This Is My Dungeon</h1>
+      <!-- Update tagline: use "hiệp sĩ" instead of "anh hùng" to match the game terminology -->
+      <p class="tagline">Tạo nhân vật và bảo vệ hầm ngục của bạn khỏi những hiệp sĩ xâm lược.</p>
+      <div class="btn-group">
+        <button id="btn-start-game" class="btn primary" onclick="window.__start && window.__start()">Bắt Đầu</button>
+        <button id="btn-continue-game" class="btn ghost" disabled>Tiếp Tục</button>
+        <button id="btn-open-settings" class="btn ghost" onclick="window.__openSettings && window.__openSettings()">Cài Đặt</button>
+      </div>
+    </header>
+  </section>
+
+  <!-- Character creation panel -->
+  <section id="character-panel" class="panel" hidden>
+    <h2>Tạo nhân vật</h2>
+    <label class="field">
+      Tên nhân vật
+      <input type="text" id="char-name" placeholder="Nhập tên của bạn">
+    </label>
+    <label class="field">
+      Class
+      <select id="char-class">
+        <option value="berserker">Berserker</option>
+            <option value="builder">Builders</option>
+      </select>
+    </label>
+    <div class="stats-info">
+      <p>Berserker: ATK 5, HP 3 – càng mất máu thì tấn công càng mạnh.</p>
+    </div>
+    <button id="btn-create-character" class="btn primary">Tạo Nhân Vật</button>
+  </section>
+
+  <!-- Main game section -->
+  <section id="game-section" hidden>
+    <!-- Phase indicator -->
+    <div id="phase-info" class="phase-info"></div>
+    <!-- Dungeon grid -->
+    <div id="grid-container" class="grid"></div>
+    <!-- Inventory bar for dragging items -->
+    <div id="inventory-bar" class="inventory"></div>
+        <div id="variant-bar" class="inventory variants"></div>
+    <!-- Controls (varies by phase) -->
+    <div id="controls" class="controls"></div>
+    <!-- Log messages -->
+    <div id="log" class="log"></div>
+  </section>
+
+  <!-- Boss fight panel -->
+  
+  <!-- Boss fight panel (grid) -->
+  <section id="boss-panel" class="panel" hidden>
+    <h2>Đối đầu hiệp sĩ</h2>
+    <div class="boss-wrapper" id="boss-wrapper">
+      <div class="boss-left">
+        <div id="boss-grid" class="boss-grid"></div>
+        <div class="boss-hint">Di chuyển 1 ô = 1 AP • Click kề cận = tấn công (2 AP) • Lao vào ô địch = đánh ngay (1 AP)</div>
+      </div>
+      <aside class="boss-right">
+        <div class="boss-hud">
+          <div class="hud-item">AP: <b id="boss-ap">0/0</b></div>
+          <div class="hud-item">HP bạn: <b id="boss-php">0/0</b></div>
+          <div class="hud-item">HP địch: <b id="boss-ehp">0/0</b></div>
+        </div>
+        <div id="boss-controls" class="boss-controls">
+          <button id="btn-boss-s1">Skill 1</button>
+          <button id="btn-boss-s2">Skill 2</button>
+          <button id="btn-boss-s3">Skill 3</button>
+          <button id="btn-attack-boss" class="wide">Hết lượt</button>
+        </div>
+        <div id="boss-info" class="boss-info"></div>
+        <div id="boss-log" class="log small"></div>
+      </aside>
+    </div>
+  </section>
+
+
+  <!-- Shopping panel -->
+  <section id="shop-panel" class="panel" hidden>
+    <h2>Cửa hàng</h2>
+    <div id="shop-info" class="shop-info"></div>
+    <div id="shop-items" class="shop-items"></div>
+    <button id="btn-next-level" class="btn primary">Bắt đầu màn tiếp theo</button>
+  </section>
+
+  <!-- Settings panel -->
+  <section id="settings-panel" class="panel" hidden>
+    <h2>Cài đặt</h2>
+    <p>Tùy chọn cài đặt sẽ sớm được bổ sung.</p>
+    <button id="btn-close-settings" class="btn ghost">Đóng</button>
+  </section>
+
+  <!-- Level up panel: allocate stat points when leveling -->
+  <section id="level-up-panel" class="panel" hidden>
+    <h2>Tăng cấp</h2>
+    <p>Điểm còn lại: <span id="stat-points">0</span></p>
+    <div id="stat-options" class="stat-options">
+      <div class="stat-row">
+        <span>ATK: <span id="stat-atk-value">0</span></span>
+        <button id="btn-stat-atk" class="btn small">+</button>
+      </div>
+      <div class="stat-row">
+        <span>HP: <span id="stat-hp-value">0</span></span>
+        <button id="btn-stat-hp" class="btn small">+</button>
+      </div>
+      <div class="stat-row">
+        <span>Tốc độ: <span id="stat-speed-value">0</span></span>
+        <button id="btn-stat-speed" class="btn small">+</button>
+      </div>
+    </div>
+    <button id="btn-confirm-stats" class="btn primary" disabled>Xong</button>
+  </section>
+
+  <!-- Game over panel -->
+  <section id="gameover-panel" class="panel" hidden>
+    <h2>Game Over</h2>
+    <p>Bạn đã thất bại! Chơi lại?</p>
+    <button id="btn-restart" class="btn primary">Chơi lại</button>
+  </section>
+
+  <footer class="footer">
+    © <span id="year"></span> This Is My Dungeon
+  </footer>
+
+  <!-- Game logic script -->
+  <script src="game.js" defer></script>
+</body>
+</html>
